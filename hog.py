@@ -22,6 +22,16 @@ def roll_dice(num_rolls, dice=six_sided):
     assert type(num_rolls) == int, 'num_rolls must be an integer.'
     assert num_rolls > 0, 'Must roll at least once.'
     "*** YOUR CODE HERE ***"
+    # naive rolling
+    results = []
+    for i in range(num_rolls):
+        results.append(dice())
+
+    # check for Pig out
+    if 1 in results:
+        return 1
+
+    return sum(results)
 
 
 def take_turn(num_rolls, opponent_score, dice=six_sided):
