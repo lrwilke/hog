@@ -11,6 +11,9 @@ GOAL_SCORE = 100 # The goal of Hog is to score 100 points.
 
 # Taking turns
 
+def free_bacon(score):
+    return max(score // 10, score % 10) + 1
+
 def roll_dice(num_rolls, dice=six_sided):
     """Roll DICE for NUM_ROLLS times.  Return either the sum of the outcomes,
     or 1 if a 1 is rolled (Pig out). This calls DICE exactly NUM_ROLLS times.
@@ -47,8 +50,7 @@ def take_turn(num_rolls, opponent_score, dice=six_sided):
     "*** YOUR CODE HERE ***"
     if num_rolls == 0:
         # Free bacon -> return one more than the max of the opponent_score digits
-        first_digit, second_digit = opponent_score // 10, opponent_score % 10
-        return max(first_digit, second_digit) + 1
+        return free_bacon(opponent_score)
 
     return roll_dice(num_rolls, dice)
 
@@ -245,7 +247,9 @@ def bacon_strategy(score, opponent_score):
     0
     """
     "*** YOUR CODE HERE ***"
-    return 5 # Replace this statement
+    if free_bacon(opponent_score) >= BACON_MARGIN:
+        return 0
+    return BASELINE_NUM_ROLLS
 
 def swap_strategy(score, opponent_score):
     """This strategy rolls 0 dice when it would result in a beneficial swap and
