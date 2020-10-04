@@ -33,7 +33,6 @@ def roll_dice(num_rolls, dice=six_sided):
 
     return sum(results)
 
-
 def take_turn(num_rolls, opponent_score, dice=six_sided):
     """Simulate a turn rolling NUM_ROLLS dice, which may be 0 (Free bacon).
 
@@ -97,7 +96,22 @@ def play(strategy0, strategy1, goal=GOAL_SCORE):
     who = 0  # Which player is about to take a turn, 0 (first) or 1 (second)
     score, opponent_score = 0, 0
     "*** YOUR CODE HERE ***"
-    return score, opponent_score  # You may wish to change this line.
+    scores = [score, opponent_score]
+    strategies = [strategy0, strategy1]
+
+    while max(scores) < GOAL_SCORE:
+        scores[who] += play_turn(scores, strategies, who)
+        who = other(who)
+        if scores[who] == 2 * scores[other(who)] or scores[other(who)] == 2 * scores[who]:
+            scores[who], scores[other(who)] = scores[other(who)], scores[who]
+
+    return tuple(scores)
+
+def play_turn(scores, strategies, who):
+    dice = select_dice(scores[who], scores[other(who)])
+    n_rolls = strategies[who](scores[who], scores[other(who)])
+    return take_turn(n_rolls, scores[other(who)], dice)
+
 
 #######################
 # Phase 2: Strategies #
