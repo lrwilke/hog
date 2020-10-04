@@ -188,6 +188,11 @@ def max_scoring_num_rolls(dice=six_sided):
     10
     """
     "*** YOUR CODE HERE ***"
+    avg_scores = []
+    for i in range(1, 11):
+        avg_scores.append(make_averaged(roll_dice)(i, dice))
+        print(f'{i} dice scores {avg_scores[i-1]} on average')
+    print(avg_scores.index(max(avg_scores)) + 1)
 
 def winner(strategy0, strategy1):
     """Return 0 if strategy0 wins against strategy1, and 1 otherwise."""
