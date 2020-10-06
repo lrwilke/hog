@@ -5,14 +5,21 @@ from ucb import main, trace, log_current_line, interact
 
 GOAL_SCORE = 100 # The goal of Hog is to score 100 points.
 
+def free_bacon(score):
+    return max(score // 10, score % 10) + 1
+
+def hog_wild(score, opponent_score):
+    return (score + opponent_score) % 7 == 0
+
+def can_create_hog_wild(score, opponent_score):
+    return hog_wild(free_bacon(opponent_score) + score, opponent_score)
+
+
 ######################
 # Phase 1: Simulator #
 ######################
 
 # Taking turns
-
-def free_bacon(score):
-    return max(score // 10, score % 10) + 1
 
 def roll_dice(num_rolls, dice=six_sided):
     """Roll DICE for NUM_ROLLS times.  Return either the sum of the outcomes,
@@ -190,10 +197,14 @@ def max_scoring_num_rolls(dice=six_sided):
     10
     """
     "*** YOUR CODE HERE ***"
+    return max_scoring_dice(dice, False)
+
+def max_scoring_dice(dice=six_sided, silent=True):
     avg_scores = []
     for i in range(1, 11):
         avg_scores.append(make_averaged(roll_dice)(i, dice))
-        print(f'{i} dice scores {avg_scores[i-1]} on average')
+        if not silent:
+            print(f'{i} dice scores {avg_scores[i-1]} on average')
     max_scoring_rolls = avg_scores.index(max(avg_scores)) + 1
     return max_scoring_rolls
 
@@ -219,16 +230,16 @@ def run_experiments():
         four_sided_max = max_scoring_num_rolls(four_sided)
         print('Max scoring num rolls for four-sided dice:', four_sided_max)
 
-    if True: # Change to True to test always_roll(8)
+    if False: # Change to True to test always_roll(8)
         print('always_roll(5) win rate:', average_win_rate(always_roll(5)))
 
-    if True: # Change to True to test bacon_strategy
+    if False: # Change to True to test bacon_strategy
         print('bacon_strategy win rate:', average_win_rate(bacon_strategy))
 
-    if True: # Change to True to test swap_strategy
+    if False: # Change to True to test swap_strategy
         print('swap_strategy win rate:', average_win_rate(swap_strategy))
 
-    if False: # Change to True to test final_strategy
+    if True: # Change to True to test final_strategy
         print('final_strategy win rate:', average_win_rate(final_strategy))
 
     "*** You may add additional experiments as you wish ***"
@@ -275,12 +286,30 @@ def swap_strategy(score, opponent_score):
     return bacon_strategy(score, opponent_score)
 
 def final_strategy(score, opponent_score):
-    """Write a brief description of your final strategy.
+    """Strategy that implements some basic ideas and creates a Hog-Wild situation for the opponent when possible.
+    1. start game with swap_strategy
+    2. roll free_bacon if that would win the game by getting above the goal score
+    3. roll three dice if score is already in the nineties
 
-    *** YOUR DESCRIPTION HERE ***
+    Usually scores around 0.6.
     """
     "*** YOUR CODE HERE ***"
-    return 5 # Replace this statement
+
+    # starting the game
+    if score <= 10:
+        return swap_strategy(score, opponent_score)
+    # free bacon if that wins the game
+    if score + free_bacon(opponent_score) >= GOAL_SCORE:
+        return 0
+    # roll less dice (less risky) if already close to winning
+    if score >= 90:
+        return 3
+
+    # create Hog-Wild (four sided dice) for opponent
+    if can_create_hog_wild(score, opponent_score):
+        return 0
+
+    return swap_strategy(score, opponent_score)
 
 
 ##########################
